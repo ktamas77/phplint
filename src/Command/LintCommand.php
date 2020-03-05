@@ -14,7 +14,9 @@ namespace Overtrue\PHPLint\Command;
 use DateTime;
 use Exception;
 use JakubOnderka\PhpConsoleColor\ConsoleColor;
+use JakubOnderka\PhpConsoleColor\InvalidStyleException;
 use JakubOnderka\PhpConsoleHighlighter\Highlighter;
+use LogicException;
 use N98\JUnitXml\Document;
 use Overtrue\PHPLint\Cache;
 use Overtrue\PHPLint\Linter;
@@ -44,12 +46,12 @@ class LintCommand extends Command
     ];
 
     /**
-     * @var \Symfony\Component\Console\Input\InputInterface
+     * @var InputInterface
      */
     protected $input;
 
     /**
-     * @var \Symfony\Component\Console\Output\OutputInterface
+     * @var OutputInterface
      */
     protected $output;
 
@@ -125,6 +127,12 @@ class LintCommand extends Command
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Path to store JUnit XML results.'
+            )
+            ->addOption(
+                'basepath',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'A path to strip from the front of file paths inside reports.'
             );
     }
 
@@ -154,13 +162,13 @@ class LintCommand extends Command
      * @param InputInterface  $input  An InputInterface instance
      * @param OutputInterface $output An OutputInterface instance
      *
-     * @throws \LogicException When this abstract method is not implemented
+     * @throws LogicException When this abstract method is not implemented
      *
      * @return null|int null or 0 if everything went fine, or an error code
      *
      * @see setCode()
      *
-     * @throws \JakubOnderka\PhpConsoleColor\InvalidStyleException
+     * @throws InvalidStyleException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -225,6 +233,10 @@ class LintCommand extends Command
             'using_cache' => 'Yes' == $usingCache,
             'files_count' => $fileCount,
         ];
+
+        if (!empty($options['basepath'])) {
+            // @todo cut basepath from reports either here or below in the reports
+        }
 
         if (!empty($options['json'])) {
             $this->dumpJsonResult((string) $options['json'], $errors, $options, $context);
@@ -322,7 +334,7 @@ class LintCommand extends Command
      *
      * @param array $errors
      *
-     * @throws \JakubOnderka\PhpConsoleColor\InvalidStyleException
+     * @throws InvalidStyleException
      */
     protected function showErrors($errors)
     {
@@ -373,7 +385,7 @@ class LintCommand extends Command
      *
      * @return string
      *
-     * @throws \JakubOnderka\PhpConsoleColor\InvalidStyleException
+     * @throws InvalidStyleException
      */
     public function getHighlightedCodeSnippet($filePath, $lineNumber, $linesBefore = 3, $linesAfter = 3)
     {

@@ -194,7 +194,7 @@ class Linter
      *
      * @param string[] $files
      *
-     * @return \Overtrue\PHPLint\Linter
+     * @return Linter
      */
     public function setFiles(array $files)
     {
@@ -232,7 +232,7 @@ class Linter
      *
      * @param int $processLimit
      *
-     * @return \Overtrue\PHPLint\Linter
+     * @return Linter
      */
     public function setProcessLimit($processLimit)
     {
